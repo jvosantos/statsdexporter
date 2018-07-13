@@ -34,6 +34,7 @@ All fields are mandatory for now.
         "host": "localhost",
         "port": 2013,
         "app": "statsdexporter",
+        "namespace": "statsdexporter",
         "environment": "dev"
       }
     }

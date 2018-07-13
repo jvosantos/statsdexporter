@@ -3,6 +3,7 @@ package co.hold.util;
 public class Constants {
 
     public static final String PORT = "port";
+    public static final String NAMESPACE = "namespace";
     public static final String UDP = "udp";
     public static final String TCP = "tcp";
     public static final String ACTIVE = "active";

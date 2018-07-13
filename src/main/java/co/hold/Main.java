@@ -40,6 +40,7 @@ public class Main {
                 .isDryRun(statfulConfig.getBoolean(DRY_RUN))
                 .host(statfulConfig.getString(HOST))
                 .port(statfulConfig.getInt(PORT))
+                .namespace(statfulConfig.getString(NAMESPACE))
                 .app(statfulConfig.getString(APP))
                 .flushInterval(statfulConfig.getLong(FLUSH_INTERVAL))
                 .flushSize(statfulConfig.getInt(FLUSH_SIZE))
