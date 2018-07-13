@@ -22,7 +22,7 @@ public class DefaultMetricMapper implements MetricMapper<DefaultEvent> {
     private static final Logger LOGGER = Loggers.getLogger(DefaultMetricMapper.class);
     private static final Pattern ILLEGAL_CHARACTERS = Pattern.compile("[^a-zA-Z0-9_]");
     private static final Pattern BEGINS_WITH_DIGITS = Pattern.compile("^[0-9]");
-    private static final String COUNTER_METRIC_TYPE = "c";
+    private static final String GAUGE_METRIC_TYPE = MetricType.GAUGE.getType();
 
     private static final float DEFAULT_SAMPLE_RATE = 1f;
     private static final String METADATA_ERRORS = "metadata_errors";
@@ -36,7 +36,7 @@ public class DefaultMetricMapper implements MetricMapper<DefaultEvent> {
             return Flux.empty();
         }
         return Flux.merge(
-                Flux.just(this.buildEvent(COUNTER_METRIC_TYPE, "lines_received",
+                Flux.just(this.buildEvent(GAUGE_METRIC_TYPE, "lines_received",
                         metricLines.size(), DEFAULT_SAMPLE_RATE, null)),
                 Flux.merge(metricLines
                         .stream()
@@ -80,7 +80,7 @@ public class DefaultMetricMapper implements MetricMapper<DefaultEvent> {
                     value = Float.parseFloat(valueStr);
                 } catch (NumberFormatException e) {
 
-                    events.add(this.buildEvent(COUNTER_METRIC_TYPE, METADATA_ERRORS, 1f, DEFAULT_SAMPLE_RATE,
+                    events.add(this.buildEvent(GAUGE_METRIC_TYPE, METADATA_ERRORS, 1f, DEFAULT_SAMPLE_RATE,
                             ImmutableMap.of("malformed_value", "malformed_value")));
 
                     LOGGER.debug(String.format("Bad value %s on line: %s", valueStr, line));
@@ -94,7 +94,7 @@ public class DefaultMetricMapper implements MetricMapper<DefaultEvent> {
                                 if (c.length() == 0) {
                                     LOGGER.debug("Empty metadata component on line: {}", line);
 
-                                    events.add(this.buildEvent(COUNTER_METRIC_TYPE, METADATA_ERRORS,
+                                    events.add(this.buildEvent(GAUGE_METRIC_TYPE, METADATA_ERRORS,
                                             1f, DEFAULT_SAMPLE_RATE,
                                             ImmutableMap.of("malformed_metadata", "malformed_metadata")));
 
@@ -109,7 +109,7 @@ public class DefaultMetricMapper implements MetricMapper<DefaultEvent> {
                             case '@':
                                 if (!"c".equals(statType) && !"ms".equals(statType)) { //for now we only support timers and counter
 
-                                    events.add(this.buildEvent(COUNTER_METRIC_TYPE, METADATA_ERRORS,
+                                    events.add(this.buildEvent(GAUGE_METRIC_TYPE, METADATA_ERRORS,
                                             1f, DEFAULT_SAMPLE_RATE,
                                             ImmutableMap.of("illegal_metric_type", "illegal_metric_type")));
 
@@ -120,7 +120,7 @@ public class DefaultMetricMapper implements MetricMapper<DefaultEvent> {
                                     samplingFactor = Float.parseFloat((component.substring(1, component.length())));
                                 } catch (Exception e) {
 
-                                    events.add(this.buildEvent(COUNTER_METRIC_TYPE, METADATA_ERRORS,
+                                    events.add(this.buildEvent(GAUGE_METRIC_TYPE, METADATA_ERRORS,
                                             1f, DEFAULT_SAMPLE_RATE,
                                             ImmutableMap.of("invalid_sample_factor", "invalid_sample_factor")));
 
@@ -133,7 +133,7 @@ public class DefaultMetricMapper implements MetricMapper<DefaultEvent> {
                                 break;
                             default:
 
-                                events.add(this.buildEvent(COUNTER_METRIC_TYPE, METADATA_ERRORS,
+                                events.add(this.buildEvent(GAUGE_METRIC_TYPE, METADATA_ERRORS,
                                         1f, DEFAULT_SAMPLE_RATE,
                                         ImmutableMap.of("unknown_metadata_component_type", "unknown_metadata_component_type")));
 
@@ -144,12 +144,12 @@ public class DefaultMetricMapper implements MetricMapper<DefaultEvent> {
 
                 try {
                     events.add(buildEvent(statType, metric, value, samplingFactor, tags));
-                    events.add(this.buildEvent(COUNTER_METRIC_TYPE, "valid_lines",
+                    events.add(this.buildEvent(GAUGE_METRIC_TYPE, "valid_lines",
                         1f, DEFAULT_SAMPLE_RATE, null));
                     sink.success(events);
                 } catch (Exception e) {
 
-                    events.add(this.buildEvent(COUNTER_METRIC_TYPE, METADATA_ERRORS,
+                    events.add(this.buildEvent(GAUGE_METRIC_TYPE, METADATA_ERRORS,
                             1f, DEFAULT_SAMPLE_RATE, ImmutableMap.of("illegal_event", "illegal_event")));
 
                     LOGGER.debug("Error building event on line: {}", line);
@@ -158,7 +158,7 @@ public class DefaultMetricMapper implements MetricMapper<DefaultEvent> {
 
                 LOGGER.debug("Error building event on line: {}", line);
 
-                events.add(this.buildEvent(COUNTER_METRIC_TYPE, "invalid_lines",
+                events.add(this.buildEvent(GAUGE_METRIC_TYPE, "invalid_lines",
                         1f, DEFAULT_SAMPLE_RATE, ImmutableMap.of("expcetion", e.getClass().getName())));
 
                 sink.success(events); //its not really a success but I want the failure metrics as well.
