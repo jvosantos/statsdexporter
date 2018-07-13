@@ -3,6 +3,7 @@ package co.hold.receivers.udp;
 import co.hold.domain.Event;
 import co.hold.mapper.MetricMapper;
 import co.hold.senders.MetricsSender;
+import co.hold.util.Constants;
 import org.json.JSONObject;
 import reactor.util.Logger;
 import reactor.util.Loggers;
@@ -25,7 +26,8 @@ public class UdpServer {
            SO_RCVBUF	The size of the socket receive buffer
          */
 
-        reactor.ipc.netty.udp.UdpServer udpServer = reactor.ipc.netty.udp.UdpServer.create(config.getInt(PORT));
+        reactor.ipc.netty.udp.UdpServer udpServer = reactor.ipc.netty.udp.UdpServer
+                .create(config.getString(Constants.HOST), config.getInt(PORT));
 
         udpServer.startAndAwait((udpInbound, udpOutbound) -> udpInbound
                 .receive()

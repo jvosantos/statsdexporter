@@ -9,6 +9,35 @@ as metric receivers.
     |  StatsD  |---(UDP/TCP repeater)--->|  statsd_exporter  |--(UDP relay metrics)-->|  Relay       |
     +----------+                         +-------------------+                        +--------------+
 
+Configuration
+=============
+All fields are mandatory for now.
+
+    {
+      "tcp": {
+        "active": true,
+        "port": 8080
+      },
+      "udp": {
+        "active": true,
+        "port": 52167,
+        "host": 127.0.0.1
+      },
+      "mappings": [
+        {
+        }
+      ],
+      "statful": {
+        "flushInterval": 5000,
+        "flushSize": 10,
+        "dryRun": false,
+        "host": "localhost",
+        "port": 2013,
+        "app": "statsdexporter",
+        "environment": "dev"
+      }
+    }
+
 Build
 =====
     mvn clean install
