@@ -67,7 +67,7 @@ TODO
 - Custom filters on received metrics to allow further customization of actions and tag associations
 - Tests
 - Add Guice
-- Add http request for configuration
+- Add http request for remote configuration
 
 Maintainer
 ==========
