@@ -1,5 +1,6 @@
 package co.hold.receivers.udp;
 
+import co.hold.config.UdpConfiguration;
 import co.hold.domain.Event;
 import co.hold.mapper.MetricMapper;
 import co.hold.senders.MetricsSender;
@@ -17,17 +18,17 @@ public class UdpServer {
 
     private static final Logger LOGGER = Loggers.getLogger(UdpServer.class);
 
-    public static <T extends Event> void start(final JSONObject config,
+    public static <T extends Event> void start(final UdpConfiguration config,
                                                final MetricMapper<T> metricMapper,
                                                final MetricsSender<T> metricsSender) {
-        Objects.requireNonNull(config, "Configuration object must not be null");
+        Objects.requireNonNull(config, "StatsdStatfulExporterConfiguration object must not be null");
 
         /*
            SO_RCVBUF	The size of the socket receive buffer
          */
 
         reactor.ipc.netty.udp.UdpServer udpServer = reactor.ipc.netty.udp.UdpServer
-                .create(config.getString(Constants.HOST), config.getInt(PORT));
+                .create(config.getHost(), config.getPort());
 
         udpServer.startAndAwait((udpInbound, udpOutbound) -> udpInbound
                 .receive()
