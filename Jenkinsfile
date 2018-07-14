@@ -9,7 +9,6 @@ podTemplate(name: "jnlp",
         label: releases,
         namespace: "jenkins",
         containers: [
-                containerTemplate(name: 'maven', image: 'maven:3.5.3-jdk-8-alpine', ttyEnabled: true, command: 'cat'),
                 containerTemplate(name: 'gcloud-docker', image: 'gcr.io/hold-card/ops/gcloud-docker:v.2', ttyEnabled: true,
                         envVars: [
                                 envVar(key: 'SECRET_KEY_LOCATION', value: secretKeyLocation)
@@ -26,12 +25,12 @@ podTemplate(name: "jnlp",
             node(releases) {
                 stage('artifacts-build-and-release') {
                     checkout scm
-                    container('maven') {
+                    container('gcloud-docker') {
                         currentBuild.displayName = env.BUILD_NUMBER
                         currentBuild.description = env.BUILD_NUMBER
 
                         withCredentials([usernamePassword(credentialsId: 'sonar', usernameVariable: 'sonar_user', passwordVariable: 'sonar_password')]) {
-                            sh "mvn -B clean install sonar:sonar -Dsonar.host.url=${sonarqube_host} -Dsonar.login=${sonar_user} -Dsonar.password=${sonar_password}"
+                            sh "docker build -t ${name}:${env.BUILD_NUMBER} . --build-arg sonar_host=${sonar_host} --build-arg sonar_user=${sonar_user} --build-arg sonar_password=${sonar_password}"
                         }
                     }
                 }
@@ -46,7 +45,7 @@ podTemplate(name: "jnlp",
         }
 
 def dockerBuild(project, name) {
-    sh "docker build -t gcr.io/${project}/statful/${name}:${env.BUILD_NUMBER} . "
+    sh "docker tag ${name}:${env.BUILD_NUMBER} gcr.io/${project}/statful/${name}:${env.BUILD_NUMBER}"
     sh "docker push gcr.io/${project}/statful/${name}:${env.BUILD_NUMBER}"
     sh "docker rmi \$(docker images | grep gcr.io/${project}/statful/${name} | awk '{print \$3}') -f"
 }

@@ -1,3 +1,16 @@
+FROM maven:3-jdk-8 as builder
+
+WORKDIR statsd-statful-exporter
+
+COPY src src
+COPY pom.xml pom.xml
+
+ARG sonarqube_password
+ARG sonarqube_user
+ARG sonarqube_host
+
+RUN mvn -B clean install sonar:sonar -Dsonar.host.url=${sonarqube_host} -Dsonar.login=${sonar_user} -Dsonar.password=${sonar_password}
+
 FROM java:8-jdk-alpine
 
 ENV XMX -Xmx400m
@@ -9,7 +22,9 @@ ADD run/run.sh run.sh
 RUN mkdir -p /usr/opt/service
 
 # Bundle app source
-COPY ./target/statsd-statful-exporter*jar-with-dependencies.jar /usr/opt/service/service.jar
+COPY --from=builder /statsd-statful-exporter/target/statsd-statful-exporter-1.0.0-SNAPSHOT.jar /usr/opt/service/service.jar
 
 EXPOSE 8080
+EXPOSE 52167/udp
+
 ENTRYPOINT ["sh", "./run.sh"]
