@@ -5,11 +5,9 @@ WORKDIR statsd-statful-exporter
 COPY src src
 COPY pom.xml pom.xml
 
-ARG sonarqube_password
-ARG sonarqube_user
-ARG sonarqube_host
+ARG maven_commands=""
 
-RUN mvn -B clean install sonar:sonar -Dsonar.host.url=${sonarqube_host} -Dsonar.login=${sonar_user} -Dsonar.password=${sonar_password}
+RUN mvn -B clean install ${maven_commands}
 
 FROM java:8-jdk-alpine
 

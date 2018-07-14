@@ -30,7 +30,9 @@ podTemplate(name: "jnlp",
                         currentBuild.description = env.BUILD_NUMBER
 
                         withCredentials([usernamePassword(credentialsId: 'sonar', usernameVariable: 'sonar_user', passwordVariable: 'sonar_password')]) {
-                            sh "docker build -t ${name}:${env.BUILD_NUMBER} . --build-arg sonar_host=${sonar_host} --build-arg sonar_user=${sonar_user} --build-arg sonar_password=${sonar_password}"
+                            sh '''
+                            docker build -t ${name}:${env.BUILD_NUMBER} . --build-arg maven_commands="sonar:sonar -Dsonar.host.url=${sonarqube_host} -Dsonar.login=${sonar_user} -Dsonar.password=${sonar_password}"
+                            '''
                         }
                     }
                 }

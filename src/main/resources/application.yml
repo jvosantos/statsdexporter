@@ -6,7 +6,7 @@
 #  active: true
 #  port: 52167
 #  host: 127.0.0.1
-#mappings: []
+mappings: []
 statful:
   flushInterval: 5000
   flushSize: 10

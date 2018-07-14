@@ -11,33 +11,28 @@ as metric receivers.
 
 Configuration
 =============
-All fields are mandatory for now.
 
-    {
-      "tcp": {
-        "active": true,
-        "port": 8080
-      },
-      "udp": {
-        "active": true,
-        "port": 52167,
-        "host": 127.0.0.1
-      },
-      "mappings": [
-        {
-        }
-      ],
-      "statful": {
-        "flushInterval": 5000,
-        "flushSize": 10,
-        "dryRun": false,
-        "host": "localhost",
-        "port": 2013,
-        "app": "statsdexporter",
-        "namespace": "statsdexporter",
-        "environment": "dev"
-      }
-    }
+An example of a configuration file:
+
+```
+tcp:
+  port: 8080
+udp:
+  port: 52167
+  host: 127.0.0.1
+mappings: []
+statful:
+  flushInterval: 5000
+  flushSize: 10
+  dryRun: false
+  host: localhost
+  port: 2013
+  app: statsdexporter
+  namespace: statsdexporter
+  environment: local
+```
+
+For configuration of how to configure, check https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html
 
 Build
 =====
@@ -45,9 +40,7 @@ Build
 
 Run
 =====
-    java -jar target/statsd-statful-exporter-*-jar-with-dependencies.jar /optional/absolute/path/to/config
-    
-If no path to external config is provided, by default the app looks for /tmp/config.json
+    maven spring-boot:run
     
 Docker
 ======
